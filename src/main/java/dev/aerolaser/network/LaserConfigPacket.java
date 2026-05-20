@@ -10,10 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-/**
- * Enviado do GUI do cliente para o servidor quando o jogador
- * muda uma configuração do laser (zoom, cor, modo, etc.).
- */
 public record LaserConfigPacket(
         BlockPos pos,
         int zoom,
@@ -57,12 +53,10 @@ public record LaserConfigPacket(
         return TYPE;
     }
 
-    /** Handler no servidor */
     public static void handle(LaserConfigPacket pkt, IPayloadContext ctx) {
         ctx.enqueueWork(() -> {
             ServerPlayer player = (ServerPlayer) ctx.player();
             if (player.level().getBlockEntity(pkt.pos) instanceof ShowLaserBlockEntity be) {
-                // Verifica se o jogador está perto o suficiente do bloco (8 blocos)
                 double dx = player.getX() - (pkt.pos.getX() + 0.5);
                 double dy = player.getY() - (pkt.pos.getY() + 0.5);
                 double dz = player.getZ() - (pkt.pos.getZ() + 0.5);
