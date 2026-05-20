@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "simulated:block/laser_pointer/side",
+    "down":     "simulated:block/laser_pointer/side",
+    "up":       "simulated:block/laser_pointer/side",
+    "north":    "simulated:block/laser_pointer/block_powered",
+    "south":    "simulated:block/laser_pointer/side",
+    "east":     "simulated:block/laser_pointer/side",
+    "west":     "simulated:block/laser_pointer/side"
+  }
+}
