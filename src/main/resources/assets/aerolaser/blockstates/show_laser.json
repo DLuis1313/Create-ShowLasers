@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "facing=north,powered=false": { "model": "aerolaser:block/show_laser", "y": 180 },
+    "facing=north,powered=true":  { "model": "aerolaser:block/show_laser_on", "y": 180 },
+    "facing=south,powered=false": { "model": "aerolaser:block/show_laser" },
+    "facing=south,powered=true":  { "model": "aerolaser:block/show_laser_on" },
+    "facing=east,powered=false":  { "model": "aerolaser:block/show_laser", "y": 270 },
+    "facing=east,powered=true":   { "model": "aerolaser:block/show_laser_on", "y": 270 },
+    "facing=west,powered=false":  { "model": "aerolaser:block/show_laser", "y": 90 },
+    "facing=west,powered=true":   { "model": "aerolaser:block/show_laser_on", "y": 90 },
+    "facing=up,powered=false":    { "model": "aerolaser:block/show_laser", "x": 270 },
+    "facing=up,powered=true":     { "model": "aerolaser:block/show_laser_on", "x": 270 },
+    "facing=down,powered=false":  { "model": "aerolaser:block/show_laser", "x": 90 },
+    "facing=down,powered=true":   { "model": "aerolaser:block/show_laser_on", "x": 90 }
+  }
+}
