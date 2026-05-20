@@ -11,8 +11,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
- * Sent from the client GUI to the server whenever the player
- * changes a laser setting (zoom, colour, mode, etc.).
+ * Enviado do GUI do cliente para o servidor quando o jogador
+ * muda uma configuração do laser (zoom, cor, modo, etc.).
  */
 public record LaserConfigPacket(
         BlockPos pos,
@@ -57,12 +57,16 @@ public record LaserConfigPacket(
         return TYPE;
     }
 
-    /** Server-side handler */
+    /** Handler no servidor */
     public static void handle(LaserConfigPacket pkt, IPayloadContext ctx) {
         ctx.enqueueWork(() -> {
             ServerPlayer player = (ServerPlayer) ctx.player();
             if (player.level().getBlockEntity(pkt.pos) instanceof ShowLaserBlockEntity be) {
-                if (be.stillValid(player)) {
+                // Verifica se o jogador está perto o suficiente do bloco (8 blocos)
+                double dx = player.getX() - (pkt.pos.getX() + 0.5);
+                double dy = player.getY() - (pkt.pos.getY() + 0.5);
+                double dz = player.getZ() - (pkt.pos.getZ() + 0.5);
+                if (dx * dx + dy * dy + dz * dz < 64) {
                     be.setZoom(pkt.zoom);
                     be.setColorR(pkt.colorR);
                     be.setColorG(pkt.colorG);
@@ -73,13 +77,5 @@ public record LaserConfigPacket(
                 }
             }
         });
-    }
-
-    /** Helper: is this player close enough to the block? */
-    private static boolean stillValid(ShowLaserBlockEntity be, ServerPlayer player) {
-        double dx = player.getX() - (be.getBlockPos().getX() + 0.5);
-        double dy = player.getY() - (be.getBlockPos().getY() + 0.5);
-        double dz = player.getZ() - (be.getBlockPos().getZ() + 0.5);
-        return dx*dx + dy*dy + dz*dz < 64;
     }
 }
