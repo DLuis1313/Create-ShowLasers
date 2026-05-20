@@ -1,5 +1,6 @@
 package dev.aerolaser.block;
 
+import com.mojang.serialization.MapCodec;
 import dev.aerolaser.blockentity.ShowLaserBlockEntity;
 import dev.aerolaser.registry.AeroLaserBlockEntities;
 import net.minecraft.core.BlockPos;
@@ -25,6 +26,13 @@ public class ShowLaserBlock extends BaseEntityBlock {
 
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+
+    public static final MapCodec<ShowLaserBlock> CODEC = simpleCodec(ShowLaserBlock::new);
+
+    @Override
+    public MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public ShowLaserBlock(Properties properties) {
         super(properties);
