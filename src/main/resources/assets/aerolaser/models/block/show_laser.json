@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "simulated:block/laser/block"
+    "all": "simulated:block/laser_pointer/block"
   }
 }
