@@ -1,9 +1,6 @@
 package dev.aerolaser;
 
-import dev.aerolaser.registry.AeroLaserBlocks;
-import dev.aerolaser.registry.AeroLaserBlockEntities;
-import dev.aerolaser.registry.AeroLaserItems;
-import dev.aerolaser.registry.AeroLaserMenuTypes;
+import dev.aerolaser.registry.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -18,5 +15,6 @@ public class AeroLaserMod {
         AeroLaserBlockEntities.BLOCK_ENTITIES.register(modEventBus);
         AeroLaserItems.ITEMS.register(modEventBus);
         AeroLaserMenuTypes.MENUS.register(modEventBus);
+        AeroLaserCreativeTab.CREATIVE_TABS.register(modEventBus);
     }
 }
