@@ -1,3 +1,6 @@
 {
-  "parent": "aerolaser:block/show_laser"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "simulated:block/laser/block"
+  }
 }
