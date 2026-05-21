@@ -1,6 +1,12 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "all": "simulated:block/laser_pointer/block_powered"
+    "particle": "aerolaser:block/show_laser_side",
+    "down":     "aerolaser:block/show_laser_side",
+    "up":       "aerolaser:block/show_laser_top",
+    "north":    "aerolaser:block/show_laser_front_on",
+    "south":    "aerolaser:block/show_laser_side",
+    "east":     "aerolaser:block/show_laser_side",
+    "west":     "aerolaser:block/show_laser_side"
   }
 }
