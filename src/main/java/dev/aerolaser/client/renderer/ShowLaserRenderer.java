@@ -50,7 +50,7 @@ public class ShowLaserRenderer implements BlockEntityRenderer<ShowLaserBlockEnti
             VertexConsumer vc = bufferSource.getBuffer(RenderType.lines());
             Matrix4f mat = poseStack.last().pose();
             org.joml.Vector3f normal = new org.joml.Vector3f(0, 0, 1);
-            normal.mulDirection(poseStack.last().normalMatrix());
+            normal.mulDirection(poseStack.last().normal());
 
             // Linha central — mais brilhante (alpha 1.0)
             addLine(vc, mat, poseStack, 0,       0,      0, len, r, g, b, 1.0f);
@@ -85,7 +85,7 @@ public class ShowLaserRenderer implements BlockEntityRenderer<ShowLaserBlockEnti
                          float ox, float oy, float startZ, float endZ,
                          float r, float g, float b, float alpha) {
         org.joml.Vector3f n = new org.joml.Vector3f(0, 0, 1);
-        n.mulDirection(ps.last().normalMatrix());
+        n.mulDirection(ps.last().normal());
         vc.addVertex(mat, ox, oy, startZ).setColor(r, g, b, alpha).setNormal(ps.last(), n.x, n.y, n.z);
         vc.addVertex(mat, ox, oy, endZ  ).setColor(r, g, b, 0f   ).setNormal(ps.last(), n.x, n.y, n.z);
     }
