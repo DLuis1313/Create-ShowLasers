@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "simulated:block/laser/block"
+    "layer0": "simulated:block/laser_pointer/block"
   }
 }
