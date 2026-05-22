@@ -30,7 +30,6 @@ public class ShowLaserRenderer implements BlockEntityRenderer<ShowLaserBlockEnti
             float g = be.getColorG() / 255f;
             float b = be.getColorB() / 255f;
             float len = Math.min(be.getRange(), 64);
-            // zoom 1 = 1 linha, zoom 20 = feixe largo com 9 linhas
             int effectiveZoom = be.getEffectiveZoom();
             float spread = effectiveZoom * 0.018f;
             float sweepAngle = be.getSweepAngle();
@@ -49,45 +48,44 @@ public class ShowLaserRenderer implements BlockEntityRenderer<ShowLaserBlockEnti
 
             VertexConsumer vc = bufferSource.getBuffer(RenderType.lines());
             Matrix4f mat = poseStack.last().pose();
-            org.joml.Vector3f normal = new org.joml.Vector3f(0, 0, 1);
-            normal.mulDirection(poseStack.last().normal());
 
-            // Linha central — mais brilhante (alpha 1.0)
-            addLine(vc, mat, poseStack, 0,       0,      0, len, r, g, b, 1.0f);
+            // Normal fixa apontando para frente — compatível com qualquer versão
+            float nx = 0f, ny = 0f, nz = 1f;
 
-            // Linhas ao redor para simular espessura/brilho
+            // Linha central
+            addLine(vc, mat, 0,       0,      0, len, r, g, b, 1.0f, nx, ny, nz);
+
             if (effectiveZoom >= 2) {
-                addLine(vc, mat, poseStack,  spread, 0,      0, len, r, g, b, 0.6f);
-                addLine(vc, mat, poseStack, -spread, 0,      0, len, r, g, b, 0.6f);
-                addLine(vc, mat, poseStack,  0,      spread, 0, len, r, g, b, 0.6f);
-                addLine(vc, mat, poseStack,  0,     -spread, 0, len, r, g, b, 0.6f);
+                addLine(vc, mat,  spread, 0,      0, len, r, g, b, 0.6f, nx, ny, nz);
+                addLine(vc, mat, -spread, 0,      0, len, r, g, b, 0.6f, nx, ny, nz);
+                addLine(vc, mat,  0,      spread, 0, len, r, g, b, 0.6f, nx, ny, nz);
+                addLine(vc, mat,  0,     -spread, 0, len, r, g, b, 0.6f, nx, ny, nz);
             }
             if (effectiveZoom >= 5) {
                 float d = spread * 1.5f;
-                addLine(vc, mat, poseStack,  d,  d, 0, len, r, g, b, 0.3f);
-                addLine(vc, mat, poseStack, -d,  d, 0, len, r, g, b, 0.3f);
-                addLine(vc, mat, poseStack,  d, -d, 0, len, r, g, b, 0.3f);
-                addLine(vc, mat, poseStack, -d, -d, 0, len, r, g, b, 0.3f);
+                addLine(vc, mat,  d,  d, 0, len, r, g, b, 0.3f, nx, ny, nz);
+                addLine(vc, mat, -d,  d, 0, len, r, g, b, 0.3f, nx, ny, nz);
+                addLine(vc, mat,  d, -d, 0, len, r, g, b, 0.3f, nx, ny, nz);
+                addLine(vc, mat, -d, -d, 0, len, r, g, b, 0.3f, nx, ny, nz);
             }
             if (effectiveZoom >= 10) {
                 float d = spread * 2.5f;
-                addLine(vc, mat, poseStack,  d, 0,  0, len, r, g, b, 0.15f);
-                addLine(vc, mat, poseStack, -d, 0,  0, len, r, g, b, 0.15f);
-                addLine(vc, mat, poseStack,  0,  d, 0, len, r, g, b, 0.15f);
-                addLine(vc, mat, poseStack,  0, -d, 0, len, r, g, b, 0.15f);
+                addLine(vc, mat,  d,  0, 0, len, r, g, b, 0.15f, nx, ny, nz);
+                addLine(vc, mat, -d,  0, 0, len, r, g, b, 0.15f, nx, ny, nz);
+                addLine(vc, mat,  0,  d, 0, len, r, g, b, 0.15f, nx, ny, nz);
+                addLine(vc, mat,  0, -d, 0, len, r, g, b, 0.15f, nx, ny, nz);
             }
 
             poseStack.popPose();
         } catch (Exception ignored) {}
     }
 
-    private void addLine(VertexConsumer vc, Matrix4f mat, PoseStack ps,
+    private void addLine(VertexConsumer vc, Matrix4f mat,
                          float ox, float oy, float startZ, float endZ,
-                         float r, float g, float b, float alpha) {
-        org.joml.Vector3f n = new org.joml.Vector3f(0, 0, 1);
-        n.mulDirection(ps.last().normal());
-        vc.addVertex(mat, ox, oy, startZ).setColor(r, g, b, alpha).setNormal(ps.last(), n.x, n.y, n.z);
-        vc.addVertex(mat, ox, oy, endZ  ).setColor(r, g, b, 0f   ).setNormal(ps.last(), n.x, n.y, n.z);
+                         float r, float g, float b, float alpha,
+                         float nx, float ny, float nz) {
+        vc.addVertex(mat, ox, oy, startZ).setColor(r, g, b, alpha).setNormal(nx, ny, nz);
+        vc.addVertex(mat, ox, oy, endZ  ).setColor(r, g, b, 0f   ).setNormal(nx, ny, nz);
     }
 
     private void applyFacingRotation(PoseStack ps, Direction facing) {
