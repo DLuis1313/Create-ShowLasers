@@ -11,14 +11,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record LaserConfigPacket(
-        BlockPos pos,
-        int zoom,
-        int colorR,
-        int colorG,
-        int colorB,
-        int mode,
-        int sweepSpeed,
-        int range
+        BlockPos pos, int zoom, int colorR, int colorG, int colorB,
+        int mode, int sweepSpeed, int range, boolean useVeil
 ) implements CustomPacketPayload {
 
     public static final Type<LaserConfigPacket> TYPE =
@@ -26,48 +20,42 @@ public record LaserConfigPacket(
 
     public static final StreamCodec<FriendlyByteBuf, LaserConfigPacket> CODEC =
             StreamCodec.of(
-                    (buf, pkt) -> {
-                        buf.writeBlockPos(pkt.pos);
-                        buf.writeVarInt(pkt.zoom);
-                        buf.writeVarInt(pkt.colorR);
-                        buf.writeVarInt(pkt.colorG);
-                        buf.writeVarInt(pkt.colorB);
-                        buf.writeVarInt(pkt.mode);
-                        buf.writeVarInt(pkt.sweepSpeed);
-                        buf.writeVarInt(pkt.range);
+                    (buf, p) -> {
+                        buf.writeBlockPos(p.pos());
+                        buf.writeVarInt(p.zoom());
+                        buf.writeVarInt(p.colorR());
+                        buf.writeVarInt(p.colorG());
+                        buf.writeVarInt(p.colorB());
+                        buf.writeVarInt(p.mode());
+                        buf.writeVarInt(p.sweepSpeed());
+                        buf.writeVarInt(p.range());
+                        buf.writeBoolean(p.useVeil());
                     },
                     buf -> new LaserConfigPacket(
-                            buf.readBlockPos(),
-                            buf.readVarInt(),
-                            buf.readVarInt(),
-                            buf.readVarInt(),
-                            buf.readVarInt(),
-                            buf.readVarInt(),
-                            buf.readVarInt(),
-                            buf.readVarInt()
+                            buf.readBlockPos(), buf.readVarInt(), buf.readVarInt(),
+                            buf.readVarInt(), buf.readVarInt(), buf.readVarInt(),
+                            buf.readVarInt(), buf.readVarInt(), buf.readBoolean()
                     )
             );
 
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
+    @Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
 
     public static void handle(LaserConfigPacket pkt, IPayloadContext ctx) {
         ctx.enqueueWork(() -> {
             ServerPlayer player = (ServerPlayer) ctx.player();
-            if (player.level().getBlockEntity(pkt.pos) instanceof ShowLaserBlockEntity be) {
-                double dx = player.getX() - (pkt.pos.getX() + 0.5);
-                double dy = player.getY() - (pkt.pos.getY() + 0.5);
-                double dz = player.getZ() - (pkt.pos.getZ() + 0.5);
-                if (dx * dx + dy * dy + dz * dz < 64) {
-                    be.setZoom(pkt.zoom);
-                    be.setColorR(pkt.colorR);
-                    be.setColorG(pkt.colorG);
-                    be.setColorB(pkt.colorB);
-                    be.setMode(pkt.mode);
-                    be.setSweepSpeed(pkt.sweepSpeed);
-                    be.setRange(pkt.range);
+            if (player.level().getBlockEntity(pkt.pos()) instanceof ShowLaserBlockEntity be) {
+                double dx = player.getX() - (pkt.pos().getX() + 0.5);
+                double dy = player.getY() - (pkt.pos().getY() + 0.5);
+                double dz = player.getZ() - (pkt.pos().getZ() + 0.5);
+                if (dx*dx + dy*dy + dz*dz < 64) {
+                    be.setZoom(pkt.zoom());
+                    be.setColorR(pkt.colorR());
+                    be.setColorG(pkt.colorG());
+                    be.setColorB(pkt.colorB());
+                    be.setMode(pkt.mode());
+                    be.setSweepSpeed(pkt.sweepSpeed());
+                    be.setRange(pkt.range());
+                    be.setUseVeil(pkt.useVeil());
                 }
             }
         });
