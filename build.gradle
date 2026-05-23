@@ -8,11 +8,13 @@ group = project.mod_group_id
 
 repositories {
     maven {
+        name = "BlameJared Maven (Veil)"
+        url = "https://maven.blamejared.com"
+    }
+    maven {
         name = "Modrinth"
         url = "https://api.modrinth.com/maven"
-        content {
-            includeGroup "maven.modrinth"
-        }
+        content { includeGroup "maven.modrinth" }
     }
     maven {
         name = "Jitpack"
@@ -44,13 +46,6 @@ neoForge {
         server {
             server()
             programArgument '--nogui'
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-        }
-        data {
-            data()
-            programArguments.addAll '--mod', project.mod_id, '--all',
-                    '--output', file('src/generated/resources/').getAbsolutePath(),
-                    '--existing', file('src/main/resources/').getAbsolutePath()
         }
     }
 
@@ -62,8 +57,15 @@ neoForge {
 }
 
 dependencies {
-    // Create Aeronautics (Simulated) bundled jar via Modrinth
+    // Create Aeronautics
     implementation "maven.modrinth:create-aeronautics:1.2.1+mc1.21.1"
+
+    // Veil — dependência opcional (compileOnly = compila mas não empacota)
+    // Usuários precisam ter o Veil instalado para os efeitos avançados
+    compileOnly("foundry.veil:veil-neoforge-1.21.1:1.0.0.206") {
+        exclude group: "maven.modrinth"
+        exclude group: "me.fallenbreath"
+    }
 }
 
 tasks.withType(ProcessResources).configureEach {
@@ -80,9 +82,7 @@ tasks.withType(ProcessResources).configureEach {
             mod_authors            : mod_authors,
             mod_description        : mod_description
     ]
-
     inputs.properties replaceProperties
-
     filesMatching(['META-INF/neoforge.mods.toml']) {
         expand replaceProperties
     }
