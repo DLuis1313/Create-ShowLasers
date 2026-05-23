@@ -12,11 +12,7 @@ public class AeroLaserNetwork {
     @SubscribeEvent
     public static void registerPackets(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar reg = event.registrar(AeroLaserMod.MOD_ID);
-
-        reg.playToServer(
-                LaserConfigPacket.TYPE,
-                LaserConfigPacket.CODEC,
-                LaserConfigPacket::handle
-        );
+        reg.playToServer(LaserConfigPacket.TYPE,     LaserConfigPacket.CODEC,     LaserConfigPacket::handle);
+        reg.playToServer(SpotlightConfigPacket.TYPE, SpotlightConfigPacket.CODEC, SpotlightConfigPacket::handle);
     }
 }
