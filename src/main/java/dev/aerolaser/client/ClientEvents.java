@@ -2,8 +2,10 @@ package dev.aerolaser.client;
 
 import dev.aerolaser.AeroLaserMod;
 import dev.aerolaser.client.gui.ShowLaserScreen;
+import dev.aerolaser.client.gui.VeilSpotlightScreen;
 import dev.aerolaser.client.renderer.ShowLaserRenderer;
 import dev.aerolaser.client.renderer.VeilLaserRenderer;
+import dev.aerolaser.client.renderer.VeilSpotlightRenderer;
 import dev.aerolaser.registry.AeroLaserBlockEntities;
 import dev.aerolaser.registry.AeroLaserMenuTypes;
 import net.neoforged.api.distmarker.Dist;
@@ -20,23 +22,23 @@ public class ClientEvents {
     public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
         boolean veilPresent = ModList.get().isLoaded("veil");
 
+        // Show Laser — usa Veil se disponível
         if (veilPresent) {
-            // Usa o renderer avançado com Quasar e bloom
-            event.registerBlockEntityRenderer(
-                    AeroLaserBlockEntities.SHOW_LASER.get(),
-                    VeilLaserRenderer::new
-            );
+            event.registerBlockEntityRenderer(AeroLaserBlockEntities.SHOW_LASER.get(), VeilLaserRenderer::new);
         } else {
-            // Fallback: renderer de linhas simples
-            event.registerBlockEntityRenderer(
-                    AeroLaserBlockEntities.SHOW_LASER.get(),
-                    ShowLaserRenderer::new
-            );
+            event.registerBlockEntityRenderer(AeroLaserBlockEntities.SHOW_LASER.get(), ShowLaserRenderer::new);
         }
+
+        // Veil Spotlight — só registra renderer se Veil estiver instalado
+        if (veilPresent) {
+            event.registerBlockEntityRenderer(AeroLaserBlockEntities.VEIL_SPOTLIGHT.get(), VeilSpotlightRenderer::new);
+        }
+        // Se Veil não estiver instalado, o bloco não renderiza luz mas ainda funciona como bloco decorativo
     }
 
     @SubscribeEvent
     public static void onRegisterMenuScreens(RegisterMenuScreensEvent event) {
-        event.register(AeroLaserMenuTypes.SHOW_LASER_MENU.get(), ShowLaserScreen::new);
+        event.register(AeroLaserMenuTypes.SHOW_LASER_MENU.get(),     ShowLaserScreen::new);
+        event.register(AeroLaserMenuTypes.VEIL_SPOTLIGHT_MENU.get(), VeilSpotlightScreen::new);
     }
 }
