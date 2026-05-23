@@ -12,10 +12,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
-/**
- * Renderer padrão (sem Veil) — usa RenderType.lines().
- * Também usado como base pelo VeilLaserRenderer.
- */
 public class ShowLaserRenderer implements BlockEntityRenderer<ShowLaserBlockEntity> {
 
     public ShowLaserRenderer(BlockEntityRendererProvider.Context ctx) {}
@@ -34,14 +30,21 @@ public class ShowLaserRenderer implements BlockEntityRenderer<ShowLaserBlockEnti
             float g = be.getColorG() / 255f;
             float b = be.getColorB() / 255f;
             float len = Math.min(be.getRange(), 64);
-            int effectiveZoom = be.getEffectiveZoom();
-            float spread = effectiveZoom * 0.018f;
+            int zoom = be.getEffectiveZoom();
             float sweepAngle = be.getSweepAngle();
 
             poseStack.pushPose();
+
+            // Origem: centro do bloco, saindo pela face da lente (frente do modelo)
+            // O modelo laser_pointer tem a lente a ~0.94 blocos de altura (y=15/16)
+            // e a frente aponta para NORTH por padrão no blockstate
             poseStack.translate(0.5, 0.5, 0.5);
             applyFacingRotation(poseStack, facing);
 
+            // Offset para sair da ponta da lente (frente do bloco = +Z após rotação)
+            poseStack.translate(0, 0.06, 0.5); // sai pelo centro da face frontal
+
+            // Rotação do modo de varredura
             int mode = be.getMode();
             if (mode == ShowLaserBlockEntity.MODE_SWEEP ||
                 mode == ShowLaserBlockEntity.MODE_SPIN) {
@@ -54,26 +57,40 @@ public class ShowLaserRenderer implements BlockEntityRenderer<ShowLaserBlockEnti
             Matrix4f mat = poseStack.last().pose();
             float nx = 0f, ny = 0f, nz = 1f;
 
-            addLine(vc, mat, 0,       0,      0, len, r, g, b, 1.0f, nx, ny, nz);
-            if (effectiveZoom >= 2) {
-                addLine(vc, mat,  spread, 0,      0, len, r, g, b, 0.6f, nx, ny, nz);
-                addLine(vc, mat, -spread, 0,      0, len, r, g, b, 0.6f, nx, ny, nz);
-                addLine(vc, mat,  0,      spread, 0, len, r, g, b, 0.6f, nx, ny, nz);
-                addLine(vc, mat,  0,     -spread, 0, len, r, g, b, 0.6f, nx, ny, nz);
+            // Feixe central sempre presente
+            addLine(vc, mat, 0, 0, 0, len, r, g, b, 1.0f, nx, ny, nz);
+
+            // Zoom 2-4: feixe médio com 4 linhas extras
+            if (zoom >= 2) {
+                float s = zoom * 0.012f;
+                addLine(vc, mat,  s,  0, 0, len, r, g, b, 0.65f, nx, ny, nz);
+                addLine(vc, mat, -s,  0, 0, len, r, g, b, 0.65f, nx, ny, nz);
+                addLine(vc, mat,  0,  s, 0, len, r, g, b, 0.65f, nx, ny, nz);
+                addLine(vc, mat,  0, -s, 0, len, r, g, b, 0.65f, nx, ny, nz);
             }
-            if (effectiveZoom >= 5) {
-                float d = spread * 1.5f;
-                addLine(vc, mat,  d,  d, 0, len, r, g, b, 0.3f, nx, ny, nz);
-                addLine(vc, mat, -d,  d, 0, len, r, g, b, 0.3f, nx, ny, nz);
-                addLine(vc, mat,  d, -d, 0, len, r, g, b, 0.3f, nx, ny, nz);
-                addLine(vc, mat, -d, -d, 0, len, r, g, b, 0.3f, nx, ny, nz);
+            // Zoom 5-9: linhas diagonais
+            if (zoom >= 5) {
+                float s = zoom * 0.016f;
+                addLine(vc, mat,  s,  s, 0, len, r, g, b, 0.35f, nx, ny, nz);
+                addLine(vc, mat, -s,  s, 0, len, r, g, b, 0.35f, nx, ny, nz);
+                addLine(vc, mat,  s, -s, 0, len, r, g, b, 0.35f, nx, ny, nz);
+                addLine(vc, mat, -s, -s, 0, len, r, g, b, 0.35f, nx, ny, nz);
             }
-            if (effectiveZoom >= 10) {
-                float d = spread * 2.5f;
-                addLine(vc, mat,  d,  0, 0, len, r, g, b, 0.15f, nx, ny, nz);
-                addLine(vc, mat, -d,  0, 0, len, r, g, b, 0.15f, nx, ny, nz);
-                addLine(vc, mat,  0,  d, 0, len, r, g, b, 0.15f, nx, ny, nz);
-                addLine(vc, mat,  0, -d, 0, len, r, g, b, 0.15f, nx, ny, nz);
+            // Zoom 10+: anel externo
+            if (zoom >= 10) {
+                float s = zoom * 0.022f;
+                addLine(vc, mat,  s,  0, 0, len, r, g, b, 0.18f, nx, ny, nz);
+                addLine(vc, mat, -s,  0, 0, len, r, g, b, 0.18f, nx, ny, nz);
+                addLine(vc, mat,  0,  s, 0, len, r, g, b, 0.18f, nx, ny, nz);
+                addLine(vc, mat,  0, -s, 0, len, r, g, b, 0.18f, nx, ny, nz);
+            }
+            // Zoom 15+: segundo anel
+            if (zoom >= 15) {
+                float s = zoom * 0.030f;
+                addLine(vc, mat,  s,  s, 0, len, r, g, b, 0.10f, nx, ny, nz);
+                addLine(vc, mat, -s,  s, 0, len, r, g, b, 0.10f, nx, ny, nz);
+                addLine(vc, mat,  s, -s, 0, len, r, g, b, 0.10f, nx, ny, nz);
+                addLine(vc, mat, -s, -s, 0, len, r, g, b, 0.10f, nx, ny, nz);
             }
 
             poseStack.popPose();
@@ -81,9 +98,9 @@ public class ShowLaserRenderer implements BlockEntityRenderer<ShowLaserBlockEnti
     }
 
     protected void addLine(VertexConsumer vc, Matrix4f mat,
-                         float ox, float oy, float startZ, float endZ,
-                         float r, float g, float b, float alpha,
-                         float nx, float ny, float nz) {
+                           float ox, float oy, float startZ, float endZ,
+                           float r, float g, float b, float alpha,
+                           float nx, float ny, float nz) {
         vc.addVertex(mat, ox, oy, startZ).setColor(r, g, b, alpha).setNormal(nx, ny, nz);
         vc.addVertex(mat, ox, oy, endZ  ).setColor(r, g, b, 0f   ).setNormal(nx, ny, nz);
     }
