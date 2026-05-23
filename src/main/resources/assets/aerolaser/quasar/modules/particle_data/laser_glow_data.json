@@ -1,0 +1,23 @@
+{
+  "renderStyle": "BILLBOARD",
+  "modules": [
+    {
+      "module": "die_on_end"
+    },
+    {
+      "module": "color_over_lifetime",
+      "startColor": [
+        1.0,
+        1.0,
+        1.0,
+        0.8
+      ],
+      "endColor": [
+        1.0,
+        1.0,
+        1.0,
+        0.0
+      ]
+    }
+  ]
+}
