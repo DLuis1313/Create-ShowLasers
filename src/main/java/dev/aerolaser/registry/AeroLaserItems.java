@@ -12,7 +12,8 @@ public class AeroLaserItems {
             DeferredRegister.createItems(AeroLaserMod.MOD_ID);
 
     public static final DeferredItem<BlockItem> SHOW_LASER = ITEMS.register(
-            "show_laser",
-            () -> new BlockItem(AeroLaserBlocks.SHOW_LASER.get(), new Item.Properties())
-    );
+            "show_laser", () -> new BlockItem(AeroLaserBlocks.SHOW_LASER.get(), new Item.Properties()));
+
+    public static final DeferredItem<BlockItem> VEIL_SPOTLIGHT = ITEMS.register(
+            "veil_spotlight", () -> new BlockItem(AeroLaserBlocks.VEIL_SPOTLIGHT.get(), new Item.Properties()));
 }
