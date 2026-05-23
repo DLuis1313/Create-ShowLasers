@@ -1,5 +1,7 @@
 {
   "block.aerolaser.show_laser": "Laser de Show",
   "container.aerolaser.show_laser": "Config do Laser de Show",
-  "itemGroup.aerolaser.main": "AeroLaser"
+  "itemGroup.aerolaser.main": "AeroLaser",
+  "block.aerolaser.veil_spotlight": "Spotlight Veil",
+  "container.aerolaser.veil_spotlight": "Config do Spotlight Veil"
 }
