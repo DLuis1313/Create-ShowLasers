@@ -22,10 +22,11 @@ public class ShowLaserBlockEntity extends BlockEntity implements MenuProvider {
     private int colorG      = 0;
     private int colorB      = 0;
     private int mode        = 0;
-    private int sweepSpeed  = 5;  // 1=lento, 20=rápido
+    private int sweepSpeed  = 5;
     private int range       = 32;
+    private boolean useVeil = true; // alterna entre Veil e renderer padrão
 
-    private boolean active  = false;
+    private boolean active     = false;
     private float   sweepAngle = 0f;
     private int     sweepDir   = 1;
     private int     pulseTick  = 0;
@@ -41,13 +42,10 @@ public class ShowLaserBlockEntity extends BlockEntity implements MenuProvider {
         super(AeroLaserBlockEntities.SHOW_LASER.get(), pos, state);
     }
 
-    // ── Tick ─────────────────────────────────────────────────────────────────
-
     public static void tick(net.minecraft.world.level.Level level, BlockPos pos,
                             BlockState state, ShowLaserBlockEntity be) {
         if (level.isClientSide) return;
         if (!be.active) return;
-
         switch (be.mode) {
             case MODE_SWEEP  -> be.tickSweep();
             case MODE_SPIN   -> be.tickSpin();
@@ -56,7 +54,6 @@ public class ShowLaserBlockEntity extends BlockEntity implements MenuProvider {
         }
     }
 
-    // speed: 1=lento (move 0.05°/tick), 20=rápido (move 2°/tick)
     private float speedToDegrees() {
         return 0.05f + (sweepSpeed - 1) * (2f - 0.05f) / 19f;
     }
@@ -67,24 +64,19 @@ public class ShowLaserBlockEntity extends BlockEntity implements MenuProvider {
         if (sweepAngle < -45f) { sweepAngle = -45f; sweepDir =  1; }
         setChanged(); syncToClients();
     }
-
     private void tickSpin() {
         sweepAngle = (sweepAngle + speedToDegrees()) % 360f;
         setChanged(); syncToClients();
     }
-
     private void tickBounce() {
         sweepAngle += sweepDir * speedToDegrees();
         if (sweepAngle > 90f) { sweepAngle = 90f; sweepDir = -1; }
         if (sweepAngle <  0f) { sweepAngle =  0f; sweepDir =  1; }
         setChanged(); syncToClients();
     }
-
     private void tickPulse() {
-        pulseTick++;
-        // ciclo baseado na speed: speed 1 = ciclo lento, speed 20 = ciclo rápido
         int cycleLen = Math.max(1, 80 - sweepSpeed * 3);
-        if (pulseTick >= cycleLen) pulseTick = 0;
+        if (++pulseTick >= cycleLen) pulseTick = 0;
         setChanged(); syncToClients();
     }
 
@@ -102,8 +94,6 @@ public class ShowLaserBlockEntity extends BlockEntity implements MenuProvider {
         return zoom;
     }
 
-    // ── NBT ───────────────────────────────────────────────────────────────────
-
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
@@ -116,6 +106,7 @@ public class ShowLaserBlockEntity extends BlockEntity implements MenuProvider {
         tag.putInt("Range",      range);
         tag.putBoolean("Active", active);
         tag.putFloat("SweepAngle", sweepAngle);
+        tag.putBoolean("UseVeil", useVeil);
     }
 
     @Override
@@ -130,6 +121,7 @@ public class ShowLaserBlockEntity extends BlockEntity implements MenuProvider {
         range      = clamp(tag.getInt("Range"),      1, 64);
         active     = tag.getBoolean("Active");
         sweepAngle = tag.getFloat("SweepAngle");
+        useVeil    = !tag.contains("UseVeil") || tag.getBoolean("UseVeil");
     }
 
     @Override
@@ -146,9 +138,8 @@ public class ShowLaserBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     private void syncToClients() {
-        if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide)
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
-        }
     }
 
     @Override
@@ -158,10 +149,11 @@ public class ShowLaserBlockEntity extends BlockEntity implements MenuProvider {
 
     @Nullable
     @Override
-    public AbstractContainerMenu createMenu(int containerId, Inventory inv, Player player) {
-        return new ShowLaserMenu(containerId, inv, this);
+    public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
+        return new ShowLaserMenu(id, inv, this);
     }
 
+    // ── Getters / Setters ─────────────────────────────────────────────────────
     public int getZoom()        { return zoom; }
     public int getColorR()      { return colorR; }
     public int getColorG()      { return colorG; }
@@ -171,6 +163,7 @@ public class ShowLaserBlockEntity extends BlockEntity implements MenuProvider {
     public int getRange()       { return range; }
     public boolean isActive()   { return active; }
     public float getSweepAngle(){ return sweepAngle; }
+    public boolean isUseVeil()  { return useVeil; }
 
     public void setZoom(int v)       { zoom       = clamp(v,1,20);           setChanged(); }
     public void setColorR(int v)     { colorR     = clamp(v,0,255);          setChanged(); }
@@ -179,6 +172,7 @@ public class ShowLaserBlockEntity extends BlockEntity implements MenuProvider {
     public void setMode(int v)       { mode       = clamp(v,0,MODE_COUNT-1); setChanged(); }
     public void setSweepSpeed(int v) { sweepSpeed = clamp(v,1,20);           setChanged(); }
     public void setRange(int v)      { range      = clamp(v,1,64);           setChanged(); }
+    public void setUseVeil(boolean v){ useVeil = v;                          setChanged(); }
 
     private static int clamp(int val, int min, int max) {
         return Math.max(min, Math.min(max, val));
