@@ -12,6 +12,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
+/**
+ * Renderer padrão (sem Veil) — usa RenderType.lines().
+ * Também usado como base pelo VeilLaserRenderer.
+ */
 public class ShowLaserRenderer implements BlockEntityRenderer<ShowLaserBlockEntity> {
 
     public ShowLaserRenderer(BlockEntityRendererProvider.Context ctx) {}
@@ -48,13 +52,9 @@ public class ShowLaserRenderer implements BlockEntityRenderer<ShowLaserBlockEnti
 
             VertexConsumer vc = bufferSource.getBuffer(RenderType.lines());
             Matrix4f mat = poseStack.last().pose();
-
-            // Normal fixa apontando para frente — compatível com qualquer versão
             float nx = 0f, ny = 0f, nz = 1f;
 
-            // Linha central
             addLine(vc, mat, 0,       0,      0, len, r, g, b, 1.0f, nx, ny, nz);
-
             if (effectiveZoom >= 2) {
                 addLine(vc, mat,  spread, 0,      0, len, r, g, b, 0.6f, nx, ny, nz);
                 addLine(vc, mat, -spread, 0,      0, len, r, g, b, 0.6f, nx, ny, nz);
@@ -80,7 +80,7 @@ public class ShowLaserRenderer implements BlockEntityRenderer<ShowLaserBlockEnti
         } catch (Exception ignored) {}
     }
 
-    private void addLine(VertexConsumer vc, Matrix4f mat,
+    protected void addLine(VertexConsumer vc, Matrix4f mat,
                          float ox, float oy, float startZ, float endZ,
                          float r, float g, float b, float alpha,
                          float nx, float ny, float nz) {
@@ -88,7 +88,7 @@ public class ShowLaserRenderer implements BlockEntityRenderer<ShowLaserBlockEnti
         vc.addVertex(mat, ox, oy, endZ  ).setColor(r, g, b, 0f   ).setNormal(nx, ny, nz);
     }
 
-    private void applyFacingRotation(PoseStack ps, Direction facing) {
+    protected void applyFacingRotation(PoseStack ps, Direction facing) {
         switch (facing) {
             case NORTH -> ps.mulPose(new Quaternionf().rotateY((float)  Math.PI));
             case SOUTH -> {}
