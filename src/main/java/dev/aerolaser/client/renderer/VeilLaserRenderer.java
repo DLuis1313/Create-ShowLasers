@@ -29,42 +29,35 @@ public class VeilLaserRenderer extends ShowLaserRenderer {
                        int packedLight, int packedOverlay) {
         if (!be.isActive()) return;
 
-        // Renderiza o feixe base
+        // Sempre renderiza o feixe base
         super.render(be, partialTick, poseStack, bufferSource, packedLight, packedOverlay);
 
-        // Partículas Quasar no ponto de impacto
-        try {
-            spawnImpactParticles(be);
-        } catch (Exception ignored) {}
+        // Partículas Quasar só se useVeil estiver ativado no bloco
+        if (be.isUseVeil()) {
+            try {
+                spawnImpactParticles(be);
+            } catch (Exception ignored) {}
+        }
     }
 
     private void spawnImpactParticles(ShowLaserBlockEntity be) {
         if (be.getLevel() == null) return;
-        // Só emite a cada 10 ticks para performance
         if (be.getLevel().getGameTime() % 10 != 0) return;
 
         ParticleSystemManager manager = VeilRenderSystem.renderer().getParticleManager();
         BlockPos pos = be.getBlockPos();
+        var facing = be.getBlockState().getValue(dev.aerolaser.block.ShowLaserBlock.FACING);
 
-        var facing = be.getBlockState()
-                .getValue(dev.aerolaser.block.ShowLaserBlock.FACING);
-        double range = be.getRange();
         Vec3 impactPos = new Vec3(
-                pos.getX() + 0.5 + facing.getStepX() * range,
-                pos.getY() + 0.5 + facing.getStepY() * range,
-                pos.getZ() + 0.5 + facing.getStepZ() * range
+                pos.getX() + 0.5 + facing.getStepX() * be.getRange(),
+                pos.getY() + 0.5 + facing.getStepY() * be.getRange(),
+                pos.getZ() + 0.5 + facing.getStepZ() * be.getRange()
         );
 
         ParticleEmitter sparks = manager.createEmitter(SPARK_EMITTER);
-        if (sparks != null) {
-            sparks.setPosition(impactPos);
-            manager.addParticleSystem(sparks);
-        }
+        if (sparks != null) { sparks.setPosition(impactPos); manager.addParticleSystem(sparks); }
 
         ParticleEmitter glow = manager.createEmitter(GLOW_EMITTER);
-        if (glow != null) {
-            glow.setPosition(impactPos);
-            manager.addParticleSystem(glow);
-        }
+        if (glow != null) { glow.setPosition(impactPos); manager.addParticleSystem(glow); }
     }
 }
