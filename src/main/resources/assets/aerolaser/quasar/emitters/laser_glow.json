@@ -1,8 +1,0 @@
-{
-  "particle": "aerolaser:laser_glow_data",
-  "shape": "aerolaser:laser_glow_shape",
-  "settings": "aerolaser:laser_glow_settings",
-  "maxParticles": 3,
-  "particlesPerTick": 1,
-  "lifetime": 10
-}

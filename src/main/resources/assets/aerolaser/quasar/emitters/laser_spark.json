@@ -1,8 +1,0 @@
-{
-  "particle": "aerolaser:laser_spark_data",
-  "shape": "aerolaser:laser_spark_shape",
-  "settings": "aerolaser:laser_spark_settings",
-  "maxParticles": 8,
-  "particlesPerTick": 2,
-  "lifetime": 5
-}
