@@ -2,6 +2,6 @@
   "block.aerolaser.show_laser": "Show Laser",
   "container.aerolaser.show_laser": "Show Laser Config",
   "itemGroup.aerolaser.main": "AeroLaser",
-  "block.aerolaser.veil_spotlight": "Veil Spotlight",
-  "container.aerolaser.veil_spotlight": "Veil Spotlight Config"
+  "block.aerolaser.glow_lamp": "Glow Lamp",
+  "container.aerolaser.glow_lamp": "Glow Lamp Config"
 }
