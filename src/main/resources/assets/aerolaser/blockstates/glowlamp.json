@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=false": {
+      "model": "aerolaser:block/glow_lamp"
+    },
+    "powered=true": {
+      "model": "aerolaser:block/glow_lamp_on"
+    }
+  }
+}
