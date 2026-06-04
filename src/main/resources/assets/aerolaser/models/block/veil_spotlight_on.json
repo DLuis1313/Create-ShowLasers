@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "aerolaser:block/show_laser_front_on"
-  }
-}
