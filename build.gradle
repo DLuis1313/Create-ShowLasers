@@ -13,10 +13,6 @@ repositories {
         content { includeGroup "maven.modrinth" }
     }
     maven {
-        name = "BlameJared Maven (Veil)"
-        url = "https://maven.blamejared.com"
-    }
-    maven {
         name = "Jitpack"
         url = "https://jitpack.io"
     }
@@ -59,11 +55,6 @@ neoForge {
 dependencies {
     // Create Aeronautics
     implementation "maven.modrinth:create-aeronautics:1.2.1+mc1.21.1"
-
-    // Veil 4.0.0 via Modrinth (compatível com Sodium no celular)
-    compileOnly("maven.modrinth:veil:4.0.0+neoforge-1.21.1") {
-        transitive = false
-    }
 }
 
 tasks.withType(ProcessResources).configureEach {
