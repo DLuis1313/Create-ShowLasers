@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import dev.aerolaser.blockentity.GlowLampBlockEntity;
 import dev.aerolaser.registry.AeroLaserBlockEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -18,24 +19,31 @@ import org.jetbrains.annotations.Nullable;
 
 public class GlowLampBlock extends BaseEntityBlock {
 
-    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
-    public static final MapCodec<GlowLampBlock> CODEC = simpleCodec(GlowLampBlock::new);
+    // FACING como pistão: a "face" da lâmpada aponta para a direção configurada
+    public static final DirectionProperty FACING  = BlockStateProperties.FACING;
+    public static final BooleanProperty   POWERED = BlockStateProperties.POWERED;
 
+    public static final MapCodec<GlowLampBlock> CODEC = simpleCodec(GlowLampBlock::new);
     @Override public MapCodec<? extends BaseEntityBlock> codec() { return CODEC; }
 
     public GlowLampBlock(Properties props) {
         super(props);
-        registerDefaultState(stateDefinition.any().setValue(POWERED, false));
+        registerDefaultState(stateDefinition.any()
+                .setValue(FACING, Direction.UP)
+                .setValue(POWERED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> b) {
-        b.add(POWERED);
+        b.add(FACING, POWERED);
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        return defaultBlockState().setValue(POWERED, ctx.getLevel().hasNeighborSignal(ctx.getClickedPos()));
+        // A lâmpada aponta para onde o jogador está olhando (igual ao pistão)
+        return defaultBlockState()
+                .setValue(FACING, ctx.getNearestLookingDirection().getOpposite())
+                .setValue(POWERED, ctx.getLevel().hasNeighborSignal(ctx.getClickedPos()));
     }
 
     @Override
