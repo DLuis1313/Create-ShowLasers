@@ -8,7 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 
-// Slots: [0]R [1]G [2]B [3]size
+// Slots: [0]R [1]G [2]B [3]size [4]blinkEnabled(0/1) [5]blinkSpeed
 public class GlowLampMenu extends AbstractContainerMenu {
 
     private final GlowLampBlockEntity be;
@@ -21,13 +21,15 @@ public class GlowLampMenu extends AbstractContainerMenu {
     public GlowLampMenu(int id, Inventory inv, GlowLampBlockEntity be) {
         super(AeroLaserMenuTypes.GLOW_LAMP_MENU.get(), id);
         this.be = be;
-        this.data = new SimpleContainerData(4) {
+        this.data = new SimpleContainerData(6) {
             @Override public int get(int i) {
                 return switch (i) {
                     case 0 -> be.getColorR();
                     case 1 -> be.getColorG();
                     case 2 -> be.getColorB();
                     case 3 -> (int)(be.getSize() * 10);
+                    case 4 -> be.isBlinkEnabled() ? 1 : 0;
+                    case 5 -> be.getBlinkSpeed();
                     default -> 0;
                 };
             }
@@ -37,29 +39,36 @@ public class GlowLampMenu extends AbstractContainerMenu {
                     case 1 -> be.setColorG(v);
                     case 2 -> be.setColorB(v);
                     case 3 -> be.setSize(v);
+                    case 4 -> be.setBlinkEnabled(v == 1);
+                    case 5 -> be.setBlinkSpeed(v);
                 }
             }
         };
         addDataSlots(this.data);
     }
 
-    public int   getColorR() { return data.get(0); }
-    public int   getColorG() { return data.get(1); }
-    public int   getColorB() { return data.get(2); }
-    public int   getSizeInt(){ return data.get(3); }
-    public float getSize()   { return data.get(3) / 10f; }
+    public int     getColorR()      { return data.get(0); }
+    public int     getColorG()      { return data.get(1); }
+    public int     getColorB()      { return data.get(2); }
+    public int     getSizeInt()     { return data.get(3); }
+    public float   getSize()        { return data.get(3) / 10f; }
+    public boolean isBlinkEnabled() { return data.get(4) == 1; }
+    public int     getBlinkSpeed()  { return data.get(5); }
 
-    public void setColorR(int v) { data.set(0, v); }
-    public void setColorG(int v) { data.set(1, v); }
-    public void setColorB(int v) { data.set(2, v); }
-    public void setSize(int v)   { data.set(3, v); }
+    public void setColorR(int v)       { data.set(0, v); }
+    public void setColorG(int v)       { data.set(1, v); }
+    public void setColorB(int v)       { data.set(2, v); }
+    public void setSize(int v)         { data.set(3, v); }
+    public void toggleBlink()          { data.set(4, isBlinkEnabled() ? 0 : 1); }
+    public void setBlinkSpeed(int v)   { data.set(5, v); }
 
     public GlowLampBlockEntity getBlockEntity() { return be; }
 
     @Override public ItemStack quickMoveStack(Player p, int i) { return ItemStack.EMPTY; }
+
     @Override public boolean stillValid(Player player) {
         return be.getLevel() != null && AbstractContainerMenu.stillValid(
-                ContainerLevelAccess.create(be.getLevel(), be.getBlockPos()), player,
-                dev.aerolaser.registry.AeroLaserBlocks.GLOW_LAMP.get());
+                ContainerLevelAccess.create(be.getLevel(), be.getBlockPos()),
+                player, dev.aerolaser.registry.AeroLaserBlocks.GLOW_LAMP.get());
     }
 }
